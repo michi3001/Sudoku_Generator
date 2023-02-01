@@ -1,4 +1,6 @@
-/* 
+// Test the Git
+
+/*
  * File:   main.c
  * Baden-Wuerttemberg Cooperative State University
  * Created on 23. Januar 2023, 18:58
