@@ -1,5 +1,3 @@
-// Test the Git
-
 /*
  * File:   main.c
  * Baden-Wuerttemberg Cooperative State University
@@ -9,18 +7,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "stack.h"
 
 // ******************************** GLOBAL VARIABLES **********************************************************
 char cField[9][9];      //Multidimesional Array: 1st dim=row, 2nd dim=column !!!!!
-char cPlayername[20];
-
 
 // ******************************* FUNCTIONPROTOTYPES *********************************************************
-void printBoard();
+void printBoard(char*);
 void changeFieldValue(char[], int);
 void fillField();
 void fillFieldRandom();
-void userInputPlayerName();
+void userInputPlayerName(char*);
 void userInputCoordinateAndValue();
 int getRandomInteger(int, int);
 
@@ -28,29 +25,29 @@ int getRandomInteger(int, int);
 int main(int argc, char** argv)
 {  
     srand((unsigned) time(NULL));   //has to be called only once
-
+    char cPlayername[20];
+    
     fillField();
-    userInputPlayerName();
-    printBoard();
+    userInputPlayerName(cPlayername);       //Array is already a pointer due to this you musn't give the adress of it with &cPlayername
+    printBoard(cPlayername);
     
     fillFieldRandom();
-    printBoard();
+    printBoard(cPlayername);
     
     for(int i = 0; i < 1; i++) {
         userInputCoordinateAndValue();    
-        printBoard();
+        printBoard(cPlayername);
     } 
   
     return (EXIT_SUCCESS);
 }
 
 
-
 // **************************************** FUNCTIONS ********************************************************
-void printBoard() {
+void printBoard(char *p_Playername) { //Outputs the Sudoku Board on the Console
     int iArrayRowCount = 0;         //Counter which shows in which Row of the Field Array we are
     
-    printf("\n\nSpielername: %s\n", cPlayername);
+    printf("\n\nSpielername: %s\n", p_Playername);
     printf("   abc def ghi\n");                                                     //Prints the col letters
     for(int i = 0; i < 13; i++) {
         if(i==0 || i==4 || i==8 || i==12) printf("   --- --- --- \n");              //Prints the -----------------
@@ -67,7 +64,7 @@ void printBoard() {
     return;
 }
 
-void changeFieldValue(char pCoordinate[2], int pValue) {
+void changeFieldValue(char pCoordinate[2], int pValue) {    //Decodes the User Coordinate Input and changes the Value of the Field
     int iColumn = 0, iRow = 0;
     //pCoordinate[0] = Column;       pCoordinate[1] = Row 
     //Get Column
@@ -83,17 +80,16 @@ void changeFieldValue(char pCoordinate[2], int pValue) {
     return;
 }
 
-void fillField() {
+void fillField() {  //Fills the Array with *
     for(int i = 0; i < 9; i++) {
         for(int x = 0; x < 9; x++) {
-            //cField[i][x]= x+49;
             cField[i][x] = '*';
         }
     } 
     return;
 }
 
-void fillFieldRandom() {
+void fillFieldRandom() {    //Fills the Array with Random Numbers
     for(int i = 0; i < 81; i++) {
         int bool = 0;
         do {
@@ -108,13 +104,13 @@ void fillFieldRandom() {
     }
 }
 
-void userInputPlayerName() {
+void userInputPlayerName(char *p_Playername) {    //Read the players name
     printf("Please give your name: ");
-    scanf("%s", cPlayername);
+    scanf("%s", p_Playername);
     return;
 }
 
-void userInputCoordinateAndValue() {
+void userInputCoordinateAndValue() { //User inputs a Coordinate and the Value for that field
     char cCoordinate[2];                //1st element=column, 2nd element=row
     int iValue = 0;                     //This Integer stores the value which has to be changed in field xy
     
@@ -124,7 +120,7 @@ void userInputCoordinateAndValue() {
     return;
 }
 
-int getRandomInteger(int pLower, int pUpper) {    
+int getRandomInteger(int pLower, int pUpper) {    //Random Integer Generator
     int num = (rand() % (pUpper - pLower + 1)) + pLower;
     return num;    
 }
