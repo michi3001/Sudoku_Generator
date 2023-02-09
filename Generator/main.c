@@ -10,16 +10,18 @@
 #include "stack.h"
 
 // ******************************** GLOBAL VARIABLES **********************************************************
-char cField[9][9];      //Multidimesional Array: 1st dim=row, 2nd dim=column !!!!!
+char cField[9][9];      //Multidimesional Array: 1st dim=row, 2nd dim=column !!!!!define Size 
 
 // ******************************* FUNCTIONPROTOTYPES *********************************************************
 void printBoard(char*);
 void changeFieldValue(char[], int);
 void fillField();
 void fillFieldRandom();
+int checkRules(char, int, int);
 void userInputPlayerName(char*);
 void userInputCoordinateAndValue();
 int getRandomInteger(int, int);
+int checkUniqueNumber(char[]);
 
 // ************************************** MAIN ***************************************************************
 int main(int argc, char** argv)
@@ -34,17 +36,17 @@ int main(int argc, char** argv)
     fillFieldRandom();
     printBoard(cPlayername);
     
-    for(int i = 0; i < 1; i++) {
+    /* for(int i = 0; i < 1; i++) {
         userInputCoordinateAndValue();    
         printBoard(cPlayername);
-    } 
+    } */
   
     return (EXIT_SUCCESS);
 }
 
 
 // **************************************** FUNCTIONS ********************************************************
-void printBoard(char *p_Playername) { //Outputs the Sudoku Board on the Console
+void printBoard(char* p_Playername) { //Outputs the Sudoku Board on the Console
     int iArrayRowCount = 0;         //Counter which shows in which Row of the Field Array we are
     
     printf("\n\nSpielername: %s\n", p_Playername);
@@ -97,11 +99,36 @@ void fillFieldRandom() {    //Fills the Array with Random Numbers
             int iRandomRow = iRandom / 9;
             int iRandomCol = iRandom % 9;
             if (cField[iRandomRow][iRandomCol] == '*') {
-                cField[iRandomRow][iRandomCol] = (getRandomInteger(1, 9) + 48);
+                char cFieldValue = '1';
+                while((checkRules(cFieldValue, iRandomRow, iRandomCol) == 0) && cFieldValue < (9+'0')) { //Problem hier ist dass er die Schleife beendet sobald 9 erreicht wurde und dann einfach 9 eingetragen wird
+                    cFieldValue++;
+                } 
+                if (cFieldValue == (9+'0')) cField[iRandomRow][iRandomCol] = 'x';
+                else cField[iRandomRow][iRandomCol] = cFieldValue; 
+                //Aktuelles Problem Zufallsgenerator schwankt irgendwann nur noch zwischen zwei Zahlen
+                
                 bool = 1;
             }
         } while(bool==0);
+        printBoard(&"foo");
     }
+}
+
+int checkRules(char pFieldValue, int pRandomRow, int pRandomCol) {
+    int bool = 0;
+    char cRow[9], cCol[9];
+   
+    //make an array for all the numbers in the same row
+    for(int z=0; z<9;z++) cRow[z] = cField[pRandomRow][z];
+    cRow[pRandomCol] = pFieldValue;
+    
+    //make an array for all the numbers in the same column
+    for(int x=0; x<9; x++) cCol[x] = cField[x][pRandomCol];
+    cCol[pRandomRow] = pFieldValue;
+    
+    if(checkUniqueNumber(cRow) == 1 && checkUniqueNumber(cCol) == 1) bool = 1;   
+    
+    return bool;
 }
 
 void userInputPlayerName(char *p_Playername) {    //Read the players name
@@ -123,4 +150,17 @@ void userInputCoordinateAndValue() { //User inputs a Coordinate and the Value fo
 int getRandomInteger(int pLower, int pUpper) {    //Random Integer Generator
     int num = (rand() % (pUpper - pLower + 1)) + pLower;
     return num;    
+}
+
+int checkUniqueNumber(char arr[9]) { //Tests if all numbers of the array are unique
+    int i, j;
+    int bool=1; //True = all numbers are unique
+
+    for (i = 0; i < 9; i++) {
+        for (j = i + 1; j < 9; j++) {
+            if (arr[i] == arr[j] && arr[j] != '*')
+                bool = 0;           //False
+        }
+    }
+    return bool;
 }
