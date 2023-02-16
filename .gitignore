@@ -86,3 +86,4 @@ Spielfeld_Ausgabe/nbproject/private/Makefile-variables.mk
 Spielfeld_Ausgabe/nbproject/private/private.xml
 Generator/gdb.exe.stackdump
 Generator/generator.exe.stackdump
+Generator/.dep.inc
