@@ -1,42 +1,31 @@
-/*
- * File:   main.c
- * Baden-Wuerttemberg Cooperative State University
- * Created on 23. Januar 2023, 18:58
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
 #include "stack.h"
-//#include "stack.h"
 
 // ******************************** GLOBAL VARIABLES **********************************************************
 char cField[9][9];      //Multidimesional Array: 1st dim=row, 2nd dim=column !!!!!define Size 
 
-/* struct Storage {
-    int Coordinate;
-    int Value;
-}; */
 
 // ******************************* FUNCTIONPROTOTYPES *********************************************************
 void printBoard(char*);
 void changeFieldValue(char[], int);
-void fillField();
+void clearField();
 void fillFieldRandom(char*);
 int checkRules(char, int, int);
 void userInputPlayerName(char*);
 void userInputCoordinateAndValue();
 int getRandomInteger(int, int);
-int checkNumberIsUnique(char[], char);
+int checkNumberIsNotInArray(char[], char);
+
 
 // ************************************** MAIN ***************************************************************
 int main(int argc, char** argv)
 {
-    srand((unsigned) time(NULL));   //has to be called only once
+    srand((unsigned) time(NULL));   //has to be called only once for generating random numbers
     char cPlayername[20];
     
-    fillField();
+    clearField();
     userInputPlayerName(cPlayername);       //Array is already a pointer due to this you musn't give the adress of it with &cPlayername
     printBoard(cPlayername);
 
@@ -93,7 +82,7 @@ void changeFieldValue(char pCoordinate[2], int pValue) {    //Decodes the User C
 
 
 
-void fillField() {  //Fills the Array with *
+void clearField() {  //Fills the Array with *
     for(int i = 0; i < 9; i++) {
         for(int x = 0; x < 9; x++) cField[i][x] = '*';
     }
@@ -106,49 +95,44 @@ void fillFieldRandom(char* p_Playername) {    //Fills the Array with Random Numb
     int StackCoordinate;
     myStack_t* Stack = StackNew(sizeof(StackCoordinate), 81);
     if (IsStackEmpty(Stack) == 0) printf("\n!!!Error the Stack is not empty!!!\nPlease restart the program");
-    int iAnzNumbers = 0;
-    int iAnzBacktrack = 0;
+    int iCountNumbersInField = 0;
+    int iCountBacktracks = 0;
     
-    while(iAnzNumbers < 81) {
+    while(iCountNumbersInField < 81) {
         int iRandomCoordinate = getRandomInteger(0, 80);
         int iRandomRow = iRandomCoordinate / 9;
         int iRandomCol = iRandomCoordinate % 9;
 
-
-        if (cField[iRandomRow][iRandomCol] == '*') {            
+        if (cField[iRandomRow][iRandomCol] == '*') {   //Find Empty Fields         
             char cFieldValue = '0';
             do {
                 cFieldValue++;
-            } while ((checkRules(cFieldValue, iRandomRow, iRandomCol) == 0) && cFieldValue <= (9+'0'));
+            } while ((checkRules(cFieldValue, iRandomRow, iRandomCol) == 0) && cFieldValue <= (9+'0')); //break if Rules are correct and the Value <= 9
 
-            if (cFieldValue > (9+'0')) {   //Backtrack Fall
-                iAnzBacktrack++;
+            if (cFieldValue > (9+'0')) {   //Backtrack Case
+                iCountBacktracks++;
 
-                for(int u=0; u < iAnzBacktrack; u++) {
-                    Pop(Stack, &StackCoordinate);         //Letzter Stack Wert wirt in sStorage gespeichert
+                for(int u=0; u < iCountBacktracks; u++) {   //Clear the last x fields (x = Number of Backtracks until now)
+                    Pop(Stack, &StackCoordinate);         
                     iRandomRow = StackCoordinate / 9;
                     iRandomCol = StackCoordinate % 9;
                     cField[iRandomRow][iRandomCol] = '*';
-                    iAnzNumbers--;
+                    iCountNumbersInField--;
                         
-                    if (IsStackEmpty(Stack) == 1) {
-                    fillField();
-                    iAnzBacktrack = 0;
+                    if (IsStackEmpty(Stack) == 1) {     //If the Stack is Empty clear the field
+                    clearField();
+                    iCountBacktracks = 0;
                     }
                 }   
-                
             }
             else {
                 StackCoordinate = iRandomCoordinate;
-
-                iAnzNumbers++;                          //Jedes mal Zähler erhöhen der bei Backtracking verringert wird (enthält wieviele Zahlen gerade enthalten sind)
+                iCountNumbersInField++;                          //Counter which shows how much numbers are on the field at the moments
                 cField[iRandomRow][iRandomCol] = cFieldValue;
                 Push(Stack, &StackCoordinate);
-                
-                //printBoard(p_Playername);
             }               
-        }//END if
-    }//END while
+        }//END if empty field
+    }//END while(iCountNumbersInField < 81)
     StackDestroy(Stack);
 }//END fillFieldRandom()
 
@@ -183,7 +167,7 @@ int checkRules(char pFieldValue, int pRandomRow, int pRandomCol) {
         }
     }
 
-    if((checkNumberIsUnique(cRow, pFieldValue) == 1) && (checkNumberIsUnique(cCol, pFieldValue) == 1) && (checkNumberIsUnique(cMatrix, pFieldValue) == 1)) bool = 1;   
+    if((checkNumberIsNotInArray(cRow, pFieldValue) == 1) && (checkNumberIsNotInArray(cCol, pFieldValue) == 1) && (checkNumberIsNotInArray(cMatrix, pFieldValue) == 1)) bool = 1;   
 
     return bool;
 }//END checkRules()
@@ -217,13 +201,11 @@ int getRandomInteger(int pLower, int pUpper) {    //Random Integer Generator
 
 
 
-int checkNumberIsUnique(char arr[9], char cNumber) { //Tests if all numbers of the array are unique
-    int i, j;
+int checkNumberIsNotInArray(char arr[9], char cNumber) { //Tests if all numbers of the array are unique
     int bool=1; //True = the number isn't already in the array
-
+    
     for(int i=0; i<9; i++) {
         if(arr[i] == cNumber) bool = 0;
     }
-
     return bool;
 }//END checkNumberIsUnique()
