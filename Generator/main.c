@@ -3,6 +3,11 @@
 #include <time.h>
 #include "stack.h"
 
+struct Coordinate {
+    int row;
+    int column;
+};
+
 // ******************************** GLOBAL VARIABLES **********************************************************
 char cField[9][9];      //Multidimesional Array: 1st dim=row, 2nd dim=column !!!!!define Size 
 
@@ -27,7 +32,7 @@ int main(int argc, char** argv)
     
     clearField();
     userInputPlayerName(cPlayername);       //Array is already a pointer due to this you musn't give the adress of it with &cPlayername
-    printBoard(cPlayername);
+    //printBoard(cPlayername);
 
     fillFieldRandom(cPlayername);
     printBoard(cPlayername);
@@ -52,8 +57,8 @@ void printBoard(char* p_Playername) { //Outputs the Sudoku Board on the Console
         else {
             printf("%d ", iArrayRowCount + 1);                                      //Prints the row numbers
             for(int x = 0; x < 9; x++) {
-                if(x==0 || x==3 || x==6) printf("|%c", cField[iArrayRowCount][x]);  //Prints the lines with the field values
-                else printf("%c", cField[iArrayRowCount][x]);
+                if(x==0 || x==3 || x==6) printf("|\x1B[32m%c\x1B[0m", cField[iArrayRowCount][x]);  //Prints the lines with the field values
+                else printf("\x1B[32m%c\x1B[0m", cField[iArrayRowCount][x]);      //Belegte Felder Farbig ausgeben
             }
         printf("|\n");
         iArrayRowCount++;       //increment the ArrayCounter if one field value line was printed (else statement)
@@ -92,8 +97,9 @@ void clearField() {  //Fills the Array with *
 
 
 void fillFieldRandom(char* p_Playername) {    //Fills the Array with Random Numbers
-    int StackCoordinate;
-    myStack_t* Stack = StackNew(sizeof(StackCoordinate), 81);
+    struct Coordinate sStackCoordinate;
+    myStack_t* Stack = StackNew(sizeof(sStackCoordinate), 81);
+
     if (IsStackEmpty(Stack) == 0) printf("\n!!!Error the Stack is not empty!!!\nPlease restart the program");
     int iCountNumbersInField = 0;
     int iCountBacktracks = 0;
@@ -113,9 +119,9 @@ void fillFieldRandom(char* p_Playername) {    //Fills the Array with Random Numb
                 iCountBacktracks++;
 
                 for(int u=0; u < iCountBacktracks; u++) {   //Clear the last x fields (x = Number of Backtracks until now)
-                    Pop(Stack, &StackCoordinate);         
-                    iRandomRow = StackCoordinate / 9;
-                    iRandomCol = StackCoordinate % 9;
+                    Pop(Stack, &sStackCoordinate);
+                    iRandomRow = sStackCoordinate.row;
+                    iRandomCol = sStackCoordinate.column;
                     cField[iRandomRow][iRandomCol] = '*';
                     iCountNumbersInField--;
                         
@@ -126,10 +132,11 @@ void fillFieldRandom(char* p_Playername) {    //Fills the Array with Random Numb
                 }   
             }
             else {
-                StackCoordinate = iRandomCoordinate;
                 iCountNumbersInField++;                          //Counter which shows how much numbers are on the field at the moments
                 cField[iRandomRow][iRandomCol] = cFieldValue;
-                Push(Stack, &StackCoordinate);
+                sStackCoordinate.row = iRandomRow;
+                sStackCoordinate.column = iRandomCol;
+                Push(Stack, &sStackCoordinate);
             }               
         }//END if empty field
     }//END while(iCountNumbersInField < 81)
