@@ -43,8 +43,7 @@ int main(int argc, char** argv)
     hideFields();
     
     int bool = 0;
-    while(bool != 1) {
-        if(bool == 2) printf("\n\nYour input was not correct take care of it the next time");
+    while(bool == 0) {
         bool = UserInputMenu(cPlayername, &bCopiedOrOriginal);
     }
     
@@ -72,7 +71,6 @@ void printOriginalBoard(char* p_Playername) { //Outputs the Sudoku Board on the 
         iArrayRowCount++;       //increment the ArrayCounter if one field value line was printed (else statement)
         }
     }
-    return;
 }//END printOriginalBoard()
 
 
@@ -93,8 +91,8 @@ void printCopiedBoard(char* p_Playername) { //Outputs the Sudoku Board on the Co
         iArrayRowCount++;       //increment the ArrayCounter if one field value line was printed (else statement)
         }
     }
-    return;
 }//END printCopiedBoard()
+
 
 void changeFieldValue(char pCoordinate[2], int pValue) {    //Decodes the User Coordinate Input and changes the Value of the Field
     int iColumn = 0, iRow = 0;
@@ -109,7 +107,6 @@ void changeFieldValue(char pCoordinate[2], int pValue) {    //Decodes the User C
     else printf("\n!!!Your input was incorrect!!!");
 
     cField[iRow][iColumn] = pValue + 48;
-    return;
 }//END changeFieldValue()
 
 
@@ -118,7 +115,6 @@ void clearField() {  //Fills the Array with *
     for(int i = 0; i < 9; i++) {
         for(int x = 0; x < 9; x++) cField[i][x] = '*';
     }
-    return;
 }//END fillField()
 
 
@@ -168,7 +164,6 @@ void fillFieldRandom(char* p_Playername) {    //Fills the Array with Random Numb
         }//END if empty field
     }//END while(iCountNumbersInField < 81)
     StackDestroy(Stack);
-    return;
 }//END fillFieldRandom()
 
 
@@ -212,7 +207,6 @@ int checkRules(char pFieldValue, int pRandomRow, int pRandomCol) {
 void userInputPlayerName(char *p_Playername) {    //Read the players name
     printf("Please give your name: ");
     scanf("%s", p_Playername);
-    return;
 }//END userInputPlayerName()
 
 
@@ -224,7 +218,6 @@ void userInputCoordinateAndValue() { //User inputs a Coordinate and the Value fo
     printf("Give the Coordinate and the value (Format ColRow  value  e.g. b5 7): ");
     scanf("%s %d", cCoordinate, &iValue);
     changeFieldValue(cCoordinate, iValue);
-    return;
 }//END userInputCoordinateAndValue()
 
 
@@ -269,13 +262,12 @@ void hideFields() {
             }
         } while(bool == 0);     
 
-    }
-    
+    }  
 }
 
 
 int UserInputMenu(char* p_Playername, int* p_CopiedOrOriginal) {
-    int EndIncorrect = 0;
+    int bool = 0;
     char cSelector;
     
     printf("\033[2J"); 
@@ -285,16 +277,20 @@ int UserInputMenu(char* p_Playername, int* p_CopiedOrOriginal) {
     else if(*p_CopiedOrOriginal == 1) printOriginalBoard(p_Playername);
     else printOriginalBoard(p_Playername);
     
-    printf("Type what you want to do or put in a Coordinate and a value e.g. e5 4\n(b=Delete last described; r=Turn rules on; n=Turn rules off; s=show solution; d=solution disapears; x=EXIT GAME)\nINPUT:   ");
+    printf("Type what you want to do\n(i=Change a fieldvalue; b=Delete last described; r=Turn rules on; n=Turn rules off; s=show solution; d=solution disapears; #=EXIT GAME)\nINPUT:   ");
     scanf("%c", &cSelector);
     switch(cSelector) {
+        case 'i': {
+            userInputCoordinateAndValue(); 
+            bool = 0;
+            break;
+        }
         case 'b': NULL; break;
         case 'r': NULL; break;
         case 'n': NULL; break;
         case 's': *p_CopiedOrOriginal = 0; break;
         case 'd': *p_CopiedOrOriginal = 1;break;
-        case 'x': EndIncorrect = 1; break;      //End game
-        default: EndIncorrect = 2;              //Wrong Input
+        case '#': bool = 1; break;      //End game
     }
-    return EndIncorrect;
+    return bool;
 }
