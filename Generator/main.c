@@ -17,8 +17,8 @@ char cPlayerInputField[9][9];   //This field contains the fields which the Playe
 // ******************************* FUNCTIONPROTOTYPES *********************************************************
 void printBoard(char*);
 void printSolution(char*);
-void changeFieldValue(char[], int, myStack_t*, int*);
 void clearField();
+void changeFieldValue(char[], int, myStack_t*, int*);
 void fillFieldRandom(char*);
 int checkRules(char, int, int);
 void userInputPlayerName(char*);
@@ -98,55 +98,7 @@ void printSolution(char* p_Playername) { //Outputs the Sudoku Board on the Conso
         iArrayRowCount++;       //increment the ArrayCounter if one field value line was printed (else statement)
         }
     }
-}//END printCopiedBoard()
-
-void changeFieldValue(char pUserCoordinate[2], int pValue, myStack_t *p_PlayerStack, int* p_bRulesActivated) {    //Decodes the User Coordinate Input and changes the Value of the Field
-    int iColumn = 0, iRow = 0;
-    int bCorrect = 1;
-    struct Coordinate sUserCoordinate;
-    //pCoordinate[0] = Column;       pCoordinate[1] = Row
-    //Get Column
-    if(pUserCoordinate[0] >= 65 && pUserCoordinate[0] <= 73) iColumn = pUserCoordinate[0] - 65;
-    else if(pUserCoordinate[0] >= 97 && pUserCoordinate[0] <= 105) iColumn = pUserCoordinate[0] - 97;
-    else {
-        printf("\n!!!Your input was incorrect!!!");
-        bCorrect = 0;
-    }
-
-    //Get Row
-    if(pUserCoordinate[1] >= 49 && pUserCoordinate[1]<=57) iRow = pUserCoordinate[1] - 49;
-    else {
-        printf("\n!!!Your input was incorrect!!!");
-        bCorrect = 0;
-    }
-    
-    
-    if(pValue < 1 || pValue > 9) {
-        printf("\n!!!Your input was incorrect!!!");
-        bCorrect = 0;
-    }
-    
-    if(bCorrect == 1) {
-        if(cField[iRow][iColumn] == '*') {
-            if(*p_bRulesActivated == 1) {
-                if (checkRules((pValue+'0'), iRow, iColumn) == 0) printf("\n\nYour given value was incorrect");
-                else if(checkRules((pValue+'0'), iRow, iColumn) == 1) {
-                    cPlayerInputField[iRow][iColumn] = pValue + '0';
-                    sUserCoordinate.row = iRow;
-                    sUserCoordinate.column = iColumn;
-                    Push(p_PlayerStack, &sUserCoordinate);
-                }
-            } 
-            else if(*p_bRulesActivated == 0) {
-                cPlayerInputField[iRow][iColumn] = pValue + '0';
-                sUserCoordinate.row = iRow;
-                sUserCoordinate.column = iColumn;
-                Push(p_PlayerStack, &sUserCoordinate);
-            }
-        }
-        else printf("\n\nYour given Coordinate is already filled");
-    }
-}//END changeFieldValue()
+}//END printSolution()
 
 void clearField() {  //Fills the Array with *
     for(int i = 0; i < 9; i++) {
@@ -252,6 +204,53 @@ void userInputCoordinateAndValue(myStack_t *p_PlayerStack, int* p_bRulesActivate
     
     changeFieldValue(cCoordinate, iValue, p_PlayerStack, p_bRulesActivated);
 }//END userInputCoordinateAndValue()
+
+void changeFieldValue(char pUserCoordinate[2], int pValue, myStack_t *p_PlayerStack, int* p_bRulesActivated) {    //Decodes the User Coordinate Input and changes the Value of the Field
+    int iColumn = 0, iRow = 0;
+    int bCorrect = 1;
+    struct Coordinate sUserCoordinate;
+    //pCoordinate[0] = Column;       pCoordinate[1] = Row
+    //Get Column
+    if(pUserCoordinate[0] >= 65 && pUserCoordinate[0] <= 73) iColumn = pUserCoordinate[0] - 65;
+    else if(pUserCoordinate[0] >= 97 && pUserCoordinate[0] <= 105) iColumn = pUserCoordinate[0] - 97;
+    else {
+        printf("\n!!!Your input was incorrect!!!");
+        bCorrect = 0;
+    }
+
+    //Get Row
+    if(pUserCoordinate[1] >= 49 && pUserCoordinate[1]<=57) iRow = pUserCoordinate[1] - 49;
+    else {
+        printf("\n!!!Your input was incorrect!!!");
+        bCorrect = 0;
+    }
+    
+    if(pValue < 1 || pValue > 9) {
+        printf("\n!!!Your input was incorrect!!!");
+        bCorrect = 0;
+    }
+    
+    if(bCorrect == 1) {
+        if(cField[iRow][iColumn] == '*') {
+            if(*p_bRulesActivated == 1) {
+                if (checkRules((pValue+'0'), iRow, iColumn) == 0) printf("\n\nYour given value was incorrect");
+                else {
+                    cPlayerInputField[iRow][iColumn] = pValue + '0';
+                    sUserCoordinate.row = iRow;
+                    sUserCoordinate.column = iColumn;
+                    Push(p_PlayerStack, &sUserCoordinate);
+                }
+            } 
+            else if(*p_bRulesActivated == 0) {
+                cPlayerInputField[iRow][iColumn] = pValue + '0';
+                sUserCoordinate.row = iRow;
+                sUserCoordinate.column = iColumn;
+                Push(p_PlayerStack, &sUserCoordinate);
+            }
+        }
+        else printf("\n\nYour given Coordinate is already filled");
+    }
+}//END changeFieldValue()
 
 int getRandomInteger(int pLower, int pUpper) {    //Random Integer Generator
     int num = (rand() % (pUpper - pLower + 1)) + pLower;
